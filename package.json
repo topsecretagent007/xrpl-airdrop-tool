@@ -2,7 +2,7 @@
   "name": "xrpl-nft-airdrop-tool",
   "version": "0.1.0",
   "description": "airdrop NFTs on the XRPL",
-  "main": "main.cjs",
+  "main": "main.js",
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
