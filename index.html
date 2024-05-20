@@ -1,4 +1,201 @@
 <!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XRPL NFT Airdrop Tool</title>
+    <style>
+        body {
+            background-color: #333333;
+            color: #ffffff;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #444444;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .flex-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .flex-row label,
+        .flex-row p {
+            margin-right: 10px;
+        }
+
+        input[type="radio"] {
+            margin-right: 5px;
+        }
+
+        input[type="password"],
+        input[type="text"],
+        select,
+        input[type="datetime-local"],
+        input[type="file"],
+        button,
+        textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 4px;
+            border: none;
+            font-size: 1.1em; /* Make text fields larger */
+        }
+
+        input[type="password"],
+        input[type="text"],
+        select,
+        input[type="datetime-local"],
+        input[type="file"] {
+            background-color: #555555;
+            color: #ffffff;
+        }
+
+        button {
+            color: #ffffff;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        #viewSeed,
+        #verifySeed {
+            width: 45%; /* Set width of buttons to half the current width */
+        }
+
+        #viewSeed {
+            background-color: #007bff; /* Blue color for 'View' button */
+        }
+
+        #viewSeed:hover {
+            background-color: #0056b3;
+        }
+
+        #verifySeed {
+            background-color: #28a745; /* Green color for 'Verify' button */
+        }
+
+        #verifySeed:hover {
+            background-color: #218838;
+        }
+
+        #executeButton {
+            background-color: #ff0a0a; /* Red color for 'Start airdrop' button */
+        }
+
+        #executeButton:hover {
+            background-color: #e60000;
+        }
+
+        textarea {
+            background-color: #333333;
+            color: #ffffff;
+            resize: none;
+            height: 200px; /* Set height of text areas to 200px */
+        }
+
+        .half-width {
+            width: 48%;
+        }
+
+        @media (max-width: 768px) {
+            .flex-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .half-width {
+                width: 100%;
+            }
+
+            #viewSeed,
+            #verifySeed {
+                width: 100%; /* Set width to 100% on small screens */
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>XRPL NFT Airdrop Tool</h1>
+        <div class="flex-row">
+            <div>
+                <label><input type="radio" name="network" value="test" checked> TESTNET</label>
+                <label><input type="radio" name="network" value="main"> MAINNET</label>
+            </div>
+            <p id="xrplServer">XRPL Server: wss://s.altnet.rippletest.net:51233/</p>
+        </div>
+        <div class="flex-row">
+            <button id="viewSeed" onmousedown="showSeed()" onmouseup="hideSeed()" onmouseleave="hideSeed()">View</button>
+            <input type="password" id="seed" placeholder="Seed" onfocus="this.placeholder = ''"></input>
+            <button id="verifySeed">Verify</button>
+        </div>
+        <div class="flex-row">
+            <p id="address" style="flex-basis: 100%; margin-bottom: 10px;">Address: ------------------------------------</p>
+        </div>
+        <div class="flex-row">
+            <label for="nftDropdown">Select NFT collection:</label>
+            <select id="nftDropdown"></select>
+            <label for="expiration" style="margin-left: 20px;">Claim expiration date:</label>
+            <input type="datetime-local" id="expiration">
+        </div>
+        <div class="flex-row">
+            <label for="csvFile">Choose CSV file:</label>
+            <input type="file" id="csvFile" accept=".csv">
+            <button id="executeButton">Start airdrop</button>
+        </div>
+        <div class="flex-row">
+            <div class="half-width">
+                <label for="consoleLog">Activity Log:</label>
+                <textarea id="consoleLog" readonly></textarea>
+            </div>
+            <div class="half-width">
+                <label for="csvData">Wallet file data:</label>
+                <textarea id="csvData" readonly></textarea>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showSeed() {
+            var seedInput = document.getElementById("seed");
+            seedInput.type = "text";
+            seedInput.style.backgroundColor = '#555555';
+            seedInput.style.color = '#ffffff';
+        }
+
+        function hideSeed() {
+            var seedInput = document.getElementById("seed");
+            seedInput.type = "password";
+            seedInput.style.backgroundColor = '#555555';
+            seedInput.style.color = '#ffffff';
+        }
+    </script>
+    <script src="actions.js"></script>
+</body>
+
+</html>
+
+
+
+<!-- <!DOCTYPE html>
 <html style="background-color: #333333;">
 
 <body style="color: #ffffff;">
@@ -70,4 +267,4 @@
     <script src="actions.js"></script>
 </body>
 
-</html>
+</html> -->
