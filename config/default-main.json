@@ -1,3 +1,3 @@
 {
-    "XRPL_Server": "wss://xrplcluster.com/"
-  }
+  "XRPL_Server": "wss://old-compatible-shard.xrp-mainnet.quiknode.pro/"
+}
