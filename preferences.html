@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Set Default XRPL Endpoints</title>
+    <style>
+        body {
+            background-color: #333333;
+            color: #ffffff;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .container {
+            max-width: 100%;
+            background-color: #444444;
+            padding: 0px;
+            /* Reduced padding */
+            border-radius: 0px;
+            box-shadow: 0 0 0px rgba(0, 0, 0, 0.5);
+            height: 100%;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            border: none;
+            background-color: #555555;
+            color: #ffffff;
+            font-size: 1.1em;
+            box-sizing: border-box;
+            /* Ensure padding and border are included in the width */
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: center;
+            /* Center the buttons */
+            gap: 10px;
+            /* Add space between buttons */
+        }
+
+        .buttons button {
+            background-color: #555555;
+            color: #ffffff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            width: 100px;
+            /* Fixed width for buttons */
+            flex-shrink: 0;
+            /* Ensure buttons don't shrink */
+        }
+
+        button:hover {
+            background-color: #777777;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h2>Set Default XRPL Endpoints</h2>
+        <form>
+            <label for="mainnet">MAINNET</label>
+            <input type="text" id="mainnet" name="mainnet" value="wss://xrplcluster.com/">
+
+            <label for="testnet">TESTNET</label>
+            <input type="text" id="testnet" name="testnet" value="wss://s.altnet.rippletest.net:51233/">
+
+            <div class="buttons">
+                <button id="cancelButton" type="button">Cancel</button>
+                <button id="applyButton" type="button">Apply</button>
+                <button id="okButton" type="submit">OK</button>
+            </div>
+        </form>
+    </div>
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            const { ipcRenderer } = require('electron');
+            const fs = require('fs');
+            const path = require('path');
+
+            function setDefaultInputValues() {
+                const mainnetConfigPath = path.join(__dirname, './config/default-main.json');
+                const testnetConfigPath = path.join(__dirname, './config/default-test.json');
+
+                try {
+                    const mainnetConfig = JSON.parse(fs.readFileSync(mainnetConfigPath, 'utf8'));
+                    const mainnetInput = document.getElementById('mainnet');
+                    mainnetInput.value = mainnetConfig.XRPL_Server;
+                } catch (err) {
+                    console.error('Error reading mainnet config:', err);
+                }
+
+                try {
+                    const testnetConfig = JSON.parse(fs.readFileSync(testnetConfigPath, 'utf8'));
+                    const testnetInput = document.getElementById('testnet');
+                    testnetInput.value = testnetConfig.XRPL_Server;
+                } catch (err) {
+                    console.error('Error reading testnet config:', err);
+                }
+            }
+
+            setDefaultInputValues();
+
+            function savePreferences() {
+                const mainnetUrl = document.getElementById('mainnet').value;
+                const testnetUrl = document.getElementById('testnet').value;
+
+                const mainnetConfigPath = path.join(__dirname, 'config', `default-main.json`);
+                const testnetConfigPath = path.join(__dirname, 'config', `default-test.json`);
+
+                try {
+                    let mainnetConfig = JSON.parse(fs.readFileSync(mainnetConfigPath));
+                    mainnetConfig.XRPL_Server = mainnetUrl;
+                    fs.writeFileSync(mainnetConfigPath, JSON.stringify(mainnetConfig, null, 2));
+                    console.log('Mainnet preferences saved');
+                } catch (err) {
+                    console.error('Error saving mainnet preferences:', err);
+                }
+
+                try {
+                    let testnetConfig = JSON.parse(fs.readFileSync(testnetConfigPath));
+                    testnetConfig.XRPL_Server = testnetUrl;
+                    fs.writeFileSync(testnetConfigPath, JSON.stringify(testnetConfig, null, 2));
+                    console.log('Testnet preferences saved');
+                } catch (err) {
+                    console.error('Error saving testnet preferences:', err);
+                }
+            }
+
+            document.getElementById('cancelButton').addEventListener('click', () => {
+                // Reload the main window
+                //window.opener.location.reload();
+                window.close();
+            });
+
+            document.getElementById('applyButton').addEventListener('click', () => {
+                savePreferences();
+            });
+
+            document.getElementById('okButton').addEventListener('click', (event) => {
+                event.preventDefault();
+                savePreferences();
+                // Reload the main window
+                //win.opener.location.reload();
+                window.close();
+            });
+
+            window.addEventListener('beforeunload', function () {
+                // Reload the main window
+                //win.opener.location.reload();
+            });
+            
+        });
+    </script>
+</body>
+
+</html>

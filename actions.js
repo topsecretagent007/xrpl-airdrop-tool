@@ -2,13 +2,11 @@
 const fs = require('fs');
 const path = require('path');
 let wallets = [];
-//let allNfts = [];
 let userAddress = '';
 const xrpl = require('xrpl');
 let hot_wallet = '';
 let txnPayload = {};
 let filteredNFTMap = new Map();
-//let NFTCountMap = new Map();
 
 // prepend timestamp
 async function statusLog(message) {
@@ -26,15 +24,20 @@ async function statusLog(message) {
     consoleLog.scrollTop = consoleLog.scrollHeight;
 }
 
-
-
 document.addEventListener('DOMContentLoaded', (event) => {
     // Check for Node.js integration, critical for Electron functionality
     if (typeof require !== 'undefined') {
 
         const { ipcRenderer } = require('electron');
-        //let taxon;
-        
+        // disable and gray out <button id="executeButton">
+        document.getElementById('executeButton').disabled = true;
+        document.getElementById('executeButton').style.opacity = '0.5';
+        document.getElementById('executeButton').style.cursor = 'not-allowed';
+
+        //disable and gray out <input type="file" id="csvFile">
+        document.getElementById('csvFile').disabled = true;
+        document.getElementById('csvFile').style.opacity = '0.5';
+        document.getElementById('csvFile').style.cursor = 'not-allowed';
 
         ///////////////
         // FUNCTIONS //
@@ -45,9 +48,6 @@ document.addEventListener('DOMContentLoaded', (event) => {
             // Get the selected taxon and amount of NFTs from the dropdown
             const selectElement = document.getElementById('nftDropdown');
             const selectedTaxon = parseInt(selectElement.value, 10);
-
-            //const selectedTaxon = airdropList.get(String(selectedTaxon));
-            //const selectedTaxon = selectElement.value;
             statusLog(`Selected taxon: ${selectedTaxon}`);
 
             // Get the NFT objects from the selected taxon and store in an array
@@ -105,21 +105,6 @@ document.addEventListener('DOMContentLoaded', (event) => {
             statusLog('hot wallet is active');
 
 
-
-            //let transactionNFTArray = [];
-
-
-
-            // Get the NFTs of the selected taxon
-            // try {
-            //     transactionNFTArray = selectedTaxon ? Array.from(NFTCountMap.get(selectedTaxon) || [], ({ NFTokenID }) => ({ NFTokenID })) : [];
-            // } catch (error) {
-            //     statusLog(`Error: ${error}`);
-            // }
-
-            // Check if there are enough NFTs of the selected taxon
-
-
             // Transfer the NFTs to the wallets
             try {
                 for (const { Destination, Amount } of wallets) {
@@ -171,7 +156,6 @@ document.addEventListener('DOMContentLoaded', (event) => {
             return;
         }
 
-
         function SellOfferTxnPayload(tokenId, destination, amount) {
             // if element <p id='expiration> contains a value
             let exp = document.getElementById('expiration').value;
@@ -213,7 +197,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
         // Function to display the default XRPL server URL
         function displayDefaultServer() {
             const defaultNetwork = document.querySelector('input[name="network"]:checked').value;
-            statusLog(`default network: ${defaultNetwork}`);
+            statusLog(`Network: ${defaultNetwork}`);
             //consoleLog.value += `default network: ${defaultNetwork}`;
             const xrplServer = document.getElementById('xrplServer');
 
@@ -228,7 +212,9 @@ document.addEventListener('DOMContentLoaded', (event) => {
                 const config = JSON.parse(data);
 
                 // Set the textContent of the xrplServer element
-                xrplServer.textContent = 'XRPL Server: ' + config.XRPL_Server;
+                xrplServer.textContent = 'Node: ' + config.XRPL_Server;
+
+
             });
         }
         // Function to generate wallet address from seed
@@ -247,7 +233,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
         // Function to get NFTs from XRPL
         async function xrplgetNFTs(address) {
             // initialize xrpl client
-            const usingURL = document.getElementById('xrplServer').textContent.split(' ')[2]
+            const usingURL = document.getElementById('xrplServer').textContent.split(' ')[1]
             const client = new xrpl.Client(usingURL);
             try {
                 await client.connect();
@@ -284,7 +270,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
         // Function to Verify wallet address
         async function checkAccountValidity(address) {
             statusLog('Validating account...');
-            const usingURL = document.getElementById('xrplServer').textContent.split(' ')[2]
+            const usingURL = document.getElementById('xrplServer').textContent.split(' ')[1]
             //consoleLog.value += `\nserver: ${usingURL}`;
 
             const client = new xrpl.Client(usingURL);
@@ -333,7 +319,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
         }
 
-        let NFTCountMap = new Map(); // Map of NFTs sorted by Taxon
+        //let NFTCountMap = new Map(); // Map of NFTs sorted by Taxon
         /**
          * Function to sort NFTs by Taxon
          * @param {Array} nfts Array of NFT objects
@@ -402,7 +388,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
             statusLog('Removing NFTs with active Sell offers...');
 
             // Get the URL of the XRPL server from the form
-            const usingURL = document.getElementById('xrplServer').textContent.split(' ')[2];
+            const usingURL = document.getElementById('xrplServer').textContent.split(' ')[1];
             statusLog('\nConnecting to server...' + usingURL);
 
             // Connect to the XRPL server
@@ -469,7 +455,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
             // Log the number of NFTs removed
             statusLog(`Removed ${removedCount} NFTs with active sell offers`);
-            if (errorCount > 0) {consoleLog.value += `\nRemoved ${errorCount} NFTs due to error`};
+            if (errorCount > 0) { consoleLog.value += `\nRemoved ${errorCount} NFTs due to error` };
 
 
             // Return the modified map of NFTs
@@ -518,6 +504,11 @@ document.addEventListener('DOMContentLoaded', (event) => {
                 //statusLog(`'wallets' object data:\n` + wallets.map(obj => `Destination: ${obj.Destination}, Amount: ${obj.Amount}`).join(',\n'));
                 consoleLog.value += `\nTotal NFTs to airdrop: ${totalAmount}`;
 
+                // enable and restore the button from the previous commands: // disable and gray out <button id="executeButton">
+                document.getElementById('executeButton').disabled = false;
+                document.getElementById('executeButton').style.opacity = '1';
+                document.getElementById('executeButton').style.cursor = 'pointer';
+
             } catch (error) {
                 statusLog('Error reading file:', error);
                 throw error;
@@ -529,8 +520,6 @@ document.addEventListener('DOMContentLoaded', (event) => {
          * 
          * This function reads a CSV file and returns a JavaScript object with the data.
          * 
-         * @param {File} file The file to read
-         * @return {Promise<Object[]>} An array of objects with the CSV data
          */
         async function readCSVFile(file) {
             //statusLog('Reading CSV file');
@@ -582,7 +571,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
             elem.addEventListener('change', function () {
                 //displayDefaultServer();
                 const defaultNetwork = document.querySelector('input[name="network"]:checked').value;
-                statusLog(`default network: ${defaultNetwork}`);
+                statusLog(`Network: ${defaultNetwork}`);
                 //consoleLog.value += `\ndefault network: ${defaultNetwork}`;
                 const xrplServer = document.getElementById('xrplServer');
 
@@ -597,8 +586,8 @@ document.addEventListener('DOMContentLoaded', (event) => {
                     const config = JSON.parse(data);
 
                     // Set the textContent of the xrplServer element
-                    xrplServer.textContent = 'XRPL Server: ' + config.XRPL_Server;
-                    
+                    xrplServer.textContent = 'Node: ' + config.XRPL_Server;
+
                     alert('You are now on ' + this.value.toUpperCase() + 'NET!');
                 });
 
@@ -614,7 +603,6 @@ document.addEventListener('DOMContentLoaded', (event) => {
         });
 
         // When user clicks Verify button
-
         document.getElementById('verifySeed').addEventListener('click', async () => {
             const consoleLog = document.getElementById('consoleLog');
             statusLog('\nStarting process...');
@@ -684,7 +672,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
                     option.text = `Taxon: ${taxon}, ${objects.length}`;
                     nftsDropdown.add(option);
                 });
-                
+
                 // log a message if element <input type="file" id="csvFile"> has no file
                 if (!document.getElementById('csvFile').files.length) {
                     statusLog('Finished processing NFTs\n\nAdd a .csv file containing the receiving wallet addresses\nwith header: Destination,Amount');
@@ -693,9 +681,16 @@ document.addEventListener('DOMContentLoaded', (event) => {
                 //statusLog('Finished processing NFTs\n\nAdd a .csv file containing the receiving wallet addresses\nwith header: Destination,Amount');
 
                 await client.disconnect();
+
+                // enable <input type="file" id="csvFile"
+                document.getElementById('csvFile').disabled = false;
+                document.getElementById('csvFile').style.opacity = '1';
+                document.getElementById('csvFile').style.cursor = 'pointer';
+
             } else {
                 statusLog('\nThere was a problem filtering out sell offers: the map is undefined or null');
             }
+
         });
 
         // When .csv File input
